@@ -1,0 +1,36 @@
+* {
+  font-family: "Noto Serif KR", serif;
+}
+
+body {
+  background-image: url("/images/parchment.webp");
+  background-size: cover; /* 전체 화면에 맞게 확장 */
+  background-attachment: fixed; /* 스크롤 시 배경 고정 */
+  background-repeat: no-repeat; /* 배경 반복 방지 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  display: none;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0e4d7;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b8a899;
+  border-radius: 4px;
+  border: 2px solid #f0e4d7;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a39486;
+}

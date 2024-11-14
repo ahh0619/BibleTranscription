@@ -1,0 +1,20 @@
+.Community {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.Community button {
+  margin-top: 20px;
+  border-radius: 5px;
+  border: none;
+  width: 100px;
+  padding: 10px;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.Community button:hover {
+  background-color: #a3a3a3;
+}

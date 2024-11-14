@@ -1,0 +1,39 @@
+.Header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-image: url("/images/parchment.png");
+  background-size: cover; /* 전체 화면에 맞게 확장 */
+  background-attachment: fixed; /* 스크롤 시 배경 고정 */
+  background-repeat: no-repeat; /* 배경 반복 방지 */
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.Header h1 {
+  font-size: 1.8rem;
+  color: #4f4a4a;
+}
+
+.Header .NavButtons {
+  display: flex;
+  gap: 20px;
+}
+
+.Header button {
+  margin-top: 20px;
+  border-radius: 5px;
+  border: none;
+  width: 100px;
+  padding: 10px;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.Header button:hover {
+  background-color: #a3a3a3;
+}

@@ -1,0 +1,22 @@
+.BibleInput {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.BibleInput input {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #d8c3a5;
+  border-radius: 8px;
+  color: #4f4a4a;
+  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.BibleInput input:focus {
+  border-color: #bfa894;
+}
