@@ -1,5 +1,3 @@
-// src/Context/BibleContext.js
-
 import { createContext, useState, useEffect, useCallback } from "react";
 import { fetchBooksData, loadSavedData } from "../utils/dataUtils";
 import { disableRightClick, disableCopyPaste } from "../utils/eventHandlers";

@@ -38,7 +38,7 @@ const Header = () => {
   return (
     <div className="Header">
       <h1>따라쓰는 성경</h1>
-      <div className="NavButtons">
+      <div className="nav-buttons">
         <button onClick={showTodaysVerse}>오늘의 말씀</button>
         <button
           onClick={() => {

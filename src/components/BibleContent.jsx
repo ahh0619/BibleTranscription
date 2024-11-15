@@ -40,7 +40,7 @@ const BibleContent = () => {
   return (
     <div className="BibleContent">
       {showSelect && (
-        <div className="SelectWrap">
+        <div className="select-wrap">
           <select
             value={selectedBook}
             onChange={(e) => handleBookChangeWithFirstChapter(e.target.value)}
@@ -73,7 +73,7 @@ const BibleContent = () => {
           <h2>{selectedBook}</h2>
           <h3>제 {selectedChapter} 장</h3>
           {verses.map((verse, index) => (
-            <div key={index} className="VerseContainer">
+            <div key={index} className="verse-container">
               <BibleVerse index={index} />
               <BibleInput
                 ref={(el) => (inputRefs.current[index] = el)}

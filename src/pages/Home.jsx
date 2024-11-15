@@ -51,9 +51,9 @@ const Home = () => {
   return (
     <div className="Home">
       <h1>따라쓰는 성경</h1>
-      <div className="TheBible">
+      <div className="the-bible">
         <p>오늘의 말씀</p>
-        <div className="TodayTheBible">
+        <div className="today-the-bible">
           {todaysVerse ? (
             <>
               <p>{todaysVerse.text}</p>

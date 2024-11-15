@@ -27,14 +27,7 @@
   margin: 0;
 }
 
-.PlaceholderText {
-  color: #a3a3a3;
-  font-size: 1.2rem;
-  display: flex;
-  justify-content: center;
-}
-
-.BibleContent .SelectWrap {
+.BibleContent .select-wrap {
   display: flex;
   justify-content: center;
   gap: 20px;

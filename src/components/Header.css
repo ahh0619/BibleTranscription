@@ -18,7 +18,7 @@
   color: #4f4a4a;
 }
 
-.Header .NavButtons {
+.Header .nav-buttons {
   display: flex;
   gap: 20px;
 }
