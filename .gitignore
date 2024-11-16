@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 따라쓰는 성경.txt
-
+.env
 .vercel
