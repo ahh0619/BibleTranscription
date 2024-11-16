@@ -1,10 +1,12 @@
 export const loadSavedData = (
   readingCount,
   language,
+  userId,
   selectedBook,
   selectedChapter
 ) => {
-  const savedData = JSON.parse(localStorage.getItem("data") || "{}");
+  // 로컬스토리지에서 데이터를 가져옵니다.
+  const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
 
   // userId 및 readings 확인
   if (!savedData.userId || !savedData.readings) {

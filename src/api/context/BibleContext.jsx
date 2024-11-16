@@ -35,15 +35,26 @@ export const BibleProvider = ({ children }) => {
 
   const handleLoadSavedData = () => {
     if (!selectedBook || selectedChapter === null) return;
+
     const loadedVerses = loadSavedData(
-      userId,
       1, // 기본적으로 1독
       selectedVersion,
+      userId,
       selectedBook,
       selectedChapter
     );
-    setInputValues(loadedVerses);
+
+    const formattedValues = loadedVerses.reduce((acc, verse) => {
+      acc[verse.verse] = verse.content;
+      return acc;
+    }, {});
+
+    setInputValues(formattedValues);
   };
+
+  useEffect(() => {
+    handleLoadSavedData();
+  }, [selectedBook, selectedChapter, selectedVersion]);
 
   const handleSaveInput = (verseNumber, value) => {
     saveInputToLocalStorage(

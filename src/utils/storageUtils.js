@@ -7,9 +7,10 @@ export const saveInputToLocalStorage = (
   language,
   readingCount
 ) => {
-  const savedData = JSON.parse(localStorage.getItem("data") || "{}");
+  // 로컬스토리지에서 데이터를 가져옵니다.
+  const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
 
-  // 최상위에 userId가 없으면 추가
+  // userId와 readings 초기화
   if (!savedData.userId) {
     savedData.userId = userId;
     savedData.readings = [];
@@ -60,5 +61,5 @@ export const saveInputToLocalStorage = (
   }
 
   // 로컬스토리지에 저장
-  localStorage.setItem("data", JSON.stringify(savedData));
+  localStorage.setItem(userId, JSON.stringify(savedData));
 };
