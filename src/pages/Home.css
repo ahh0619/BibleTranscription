@@ -4,11 +4,17 @@
   align-items: center;
 }
 
-.Home .the-bible,
+.Home .the-bible {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .Home .today-the-bible {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .Home button {
