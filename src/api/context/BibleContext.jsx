@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect } from "react";
-import { disableRightClick, disableCopyPaste } from "../../utils/eventHandlers"; // import 추가
+import { disableRightClick, disableCopyPaste } from "../../utils/eventHandlers";
+import { saveInputToLocalStorage } from "../../utils/storageUtils"; // 저장/불러오기 로직 분리
+import { loadSavedData } from "../../utils/dataUtils"; // 저장/불러오기 로직 분리
 
 const BibleContext = createContext();
 
@@ -17,65 +19,46 @@ export const BibleProvider = ({ children }) => {
 
   const userId = "admin"; // 기본 userId 설정
 
-  // 로컬스토리지에서 데이터를 로드
-  const loadSavedData = () => {
-    if (!selectedBook || selectedChapter === null) return;
-
-    const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
-    const versionData = savedData[selectedVersion];
-    if (!versionData) return setInputValues({});
-
-    const bookData = versionData[selectedBook];
-    if (!bookData) return setInputValues({});
-
-    const chapterData = bookData[selectedChapter];
-    if (chapterData) {
-      setInputValues(chapterData);
-    } else {
-      setInputValues({});
+  const fetchBooks = async () => {
+    try {
+      const koBooks = await fetch(
+        "/data/NewKoreanRevisedVersion/books.json"
+      ).then((res) => res.json());
+      const enBooks = await fetch("/data/KingJamesVersion/books.json").then(
+        (res) => res.json()
+      );
+      setBooks({ ko: koBooks, en: enBooks });
+    } catch (error) {
+      console.error("Error loading books:", error);
     }
   };
 
-  // 로컬스토리지에 데이터를 저장
-  const saveInputToLocalStorage = (verseNumber, value) => {
-    const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
+  const handleLoadSavedData = () => {
+    if (!selectedBook || selectedChapter === null) return;
+    const loadedVerses = loadSavedData(
+      userId,
+      1, // 기본적으로 1독
+      selectedVersion,
+      selectedBook,
+      selectedChapter
+    );
+    setInputValues(loadedVerses);
+  };
 
-    if (!savedData[selectedVersion]) {
-      savedData[selectedVersion] = {};
-    }
-
-    if (!savedData[selectedVersion][selectedBook]) {
-      savedData[selectedVersion][selectedBook] = {};
-    }
-
-    if (!savedData[selectedVersion][selectedBook][selectedChapter]) {
-      savedData[selectedVersion][selectedBook][selectedChapter] = {};
-    }
-
-    savedData[selectedVersion][selectedBook][selectedChapter][verseNumber] =
-      value;
-
-    const dataToSave = { userId, ...savedData };
-    localStorage.setItem(userId, JSON.stringify(dataToSave));
+  const handleSaveInput = (verseNumber, value) => {
+    saveInputToLocalStorage(
+      verseNumber,
+      value,
+      userId,
+      selectedBook,
+      selectedChapter,
+      selectedVersion,
+      1 // 기본적으로 1독
+    );
   };
 
   useEffect(() => {
-    // 책 데이터를 로드
-    const loadBooks = async () => {
-      try {
-        const koBooks = await fetch(
-          "/data/NewKoreanRevisedVersion/books.json"
-        ).then((res) => res.json());
-        const enBooks = await fetch("/data/KingJamesVersion/books.json").then(
-          (res) => res.json()
-        );
-        setBooks({ ko: koBooks, en: enBooks });
-      } catch (error) {
-        console.error("Error loading books:", error);
-      }
-    };
-
-    loadBooks();
+    fetchBooks();
 
     // 이벤트 리스너 추가
     document.addEventListener("contextmenu", disableRightClick);
@@ -89,7 +72,7 @@ export const BibleProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    loadSavedData();
+    handleLoadSavedData();
   }, [selectedBook, selectedChapter, selectedVersion]);
 
   const handleBookChange = async (book) => {
@@ -147,7 +130,7 @@ export const BibleProvider = ({ children }) => {
       [verseNumber]: value,
     }));
 
-    saveInputToLocalStorage(verseNumber, value);
+    handleSaveInput(verseNumber, value);
   };
 
   return (

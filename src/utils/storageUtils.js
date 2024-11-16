@@ -4,37 +4,43 @@ export const saveInputToLocalStorage = (
   userId,
   selectedBook,
   selectedChapter,
-  selectedVersion
+  language,
+  readingCount
 ) => {
-  const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
+  const savedData = JSON.parse(localStorage.getItem("data") || "{}");
 
-  if (!savedData[userId]) {
-    savedData[userId] = { userId, readings: [] };
+  // 최상위에 userId가 없으면 추가
+  if (!savedData.userId) {
+    savedData.userId = userId;
+    savedData.readings = [];
   }
 
-  const userData = savedData[userId];
-  let currentReading = userData.readings[userData.readings.length - 1];
-
-  if (!currentReading) {
-    currentReading = {
-      readingCount: userData.readings.length + 1,
-      completedVersions: {},
-    };
-    userData.readings.push(currentReading);
+  // readingCount 초기화 및 찾기
+  let readingData = savedData.readings.find(
+    (r) => r.readingCount === readingCount
+  );
+  if (!readingData) {
+    readingData = { readingCount, versions: [] };
+    savedData.readings.push(readingData);
   }
 
-  if (!currentReading.completedVersions[selectedVersion]) {
-    currentReading.completedVersions[selectedVersion] = [];
+  // versions 초기화 및 해당 버전 찾기
+  let versionData = readingData.versions.find((v) => v.version === language);
+  if (!versionData) {
+    versionData = { version: language, completedBooks: [] };
+    readingData.versions.push(versionData);
   }
 
-  let versionData = currentReading.completedVersions[selectedVersion];
-
-  let bookData = versionData.find((b) => b.book === selectedBook);
+  // completedBooks 초기화 및 해당 책 찾기
+  let bookData = versionData.completedBooks.find(
+    (b) => b.book === selectedBook
+  );
   if (!bookData) {
     bookData = { book: selectedBook, chapters: [] };
-    versionData.push(bookData);
+    versionData.completedBooks.push(bookData);
   }
 
+  // chapters 초기화 및 해당 장 찾기
   let chapterData = bookData.chapters.find(
     (ch) => ch.chapter === selectedChapter
   );
@@ -43,6 +49,7 @@ export const saveInputToLocalStorage = (
     bookData.chapters.push(chapterData);
   }
 
+  // verses 업데이트 또는 추가
   const verseIndex = chapterData.verses.findIndex(
     (v) => v.verse === verseNumber
   );
@@ -52,5 +59,6 @@ export const saveInputToLocalStorage = (
     chapterData.verses[verseIndex].content = value;
   }
 
-  localStorage.setItem(userId, JSON.stringify(savedData));
+  // 로컬스토리지에 저장
+  localStorage.setItem("data", JSON.stringify(savedData));
 };

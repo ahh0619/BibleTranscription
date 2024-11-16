@@ -1,33 +1,42 @@
 export const loadSavedData = (
+  readingCount,
+  language,
   selectedBook,
-  selectedChapter,
-  userId,
-  selectedVersion,
-  setInputValues
+  selectedChapter
 ) => {
-  if (!selectedBook || selectedChapter === null) return;
+  const savedData = JSON.parse(localStorage.getItem("data") || "{}");
 
-  const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
-  const userData = savedData[userId];
-  if (!userData) return setInputValues({});
+  // userId 및 readings 확인
+  if (!savedData.userId || !savedData.readings) {
+    return [];
+  }
 
-  const currentReading = userData.readings[userData.readings.length - 1];
-  const versionData = currentReading?.completedVersions?.[selectedVersion];
-  if (!versionData) return setInputValues({});
+  // readingCount 찾기
+  const readingData = savedData.readings.find(
+    (r) => r.readingCount === readingCount
+  );
+  if (!readingData) {
+    return [];
+  }
 
-  const bookData = versionData.find((b) => b.book === selectedBook);
-  if (!bookData) return setInputValues({});
+  // versions에서 해당 버전 찾기
+  const versionData = readingData.versions.find((v) => v.version === language);
+  if (!versionData) {
+    return [];
+  }
 
+  // completedBooks에서 해당 책 찾기
+  const bookData = versionData.completedBooks.find(
+    (b) => b.book === selectedBook
+  );
+  if (!bookData) {
+    return [];
+  }
+
+  // chapters에서 해당 장 찾기
   const chapterData = bookData.chapters.find(
     (ch) => ch.chapter === selectedChapter
   );
-  if (chapterData) {
-    const formattedValues = chapterData.verses.reduce((acc, verse) => {
-      acc[verse.verse] = verse.content;
-      return acc;
-    }, {});
-    setInputValues(formattedValues);
-  } else {
-    setInputValues({});
-  }
+
+  return chapterData?.verses || [];
 };
