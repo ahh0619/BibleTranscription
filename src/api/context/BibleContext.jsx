@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { disableRightClick, disableCopyPaste } from "../../utils/eventHandlers"; // import 추가
 
 const BibleContext = createContext();
 
@@ -54,7 +55,6 @@ export const BibleProvider = ({ children }) => {
     savedData[selectedVersion][selectedBook][selectedChapter][verseNumber] =
       value;
 
-    // userId 포함하여 저장
     const dataToSave = { userId, ...savedData };
     localStorage.setItem(userId, JSON.stringify(dataToSave));
   };
@@ -76,6 +76,16 @@ export const BibleProvider = ({ children }) => {
     };
 
     loadBooks();
+
+    // 이벤트 리스너 추가
+    document.addEventListener("contextmenu", disableRightClick);
+    document.addEventListener("keydown", disableCopyPaste);
+
+    // 컴포넌트가 언마운트될 때 이벤트 제거
+    return () => {
+      document.removeEventListener("contextmenu", disableRightClick);
+      document.removeEventListener("keydown", disableCopyPaste);
+    };
   }, []);
 
   useEffect(() => {
