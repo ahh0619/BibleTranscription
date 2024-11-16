@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
-import BibleContext from "../context/BibleContext";
+import BibleContext from "../api/context/BibleContext";
 
 const Home = () => {
   const nav = useNavigate();
@@ -14,12 +14,12 @@ const Home = () => {
 
     const today = new Date().toISOString().split("T")[0];
     if (!storedVerse || lastUpdated !== today) {
-      fetch("/data/books.json")
+      fetch("/data/NewKoreanRevisedVersion/books.json")
         .then((response) => response.json())
         .then((books) => {
           const randomBook = books[Math.floor(Math.random() * books.length)];
 
-          return fetch(`/data/${randomBook}.json`)
+          return fetch(`/data/NewKoreanRevisedVersion/${randomBook}.json`)
             .then((response) => response.json())
             .then((bookData) => {
               const randomChapter =

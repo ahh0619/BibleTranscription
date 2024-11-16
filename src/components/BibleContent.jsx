@@ -1,52 +1,65 @@
 import { useContext, useRef } from "react";
-import BibleContext from "../context/BibleContext";
-import BibleVerse from "./BibleVerse";
 import BibleInput from "./BibleInput";
+import BibleVerse from "./BibleVerse";
+import BibleContext from "../api/context/BibleContext";
 import "./BibleContent.css";
 
 const BibleContent = () => {
   const {
-    verses,
+    books,
     selectedBook,
     selectedChapter,
-    books,
     chapters,
+    verses,
+    selectedVersion,
+    showSelect,
+    setShowSelect,
     handleBookChange,
     handleChapterChange,
-    showSelect,
+    handleVersionChange,
   } = useContext(BibleContext);
+
   const inputRefs = useRef([]);
 
+  const versionBooks =
+    selectedVersion === "NewKoreanRevisedVersion" ? books.ko : books.en;
+
   const handleEnterPress = (index) => {
-    const verseText = verses[index]?.text;
-    const inputValue = inputRefs.current[index]?.value || "";
-    if (inputValue === verseText) {
-      const nextIndex = index + 1;
-      if (inputRefs.current[nextIndex]) {
-        inputRefs.current[nextIndex].focus();
-      }
+    const nextIndex = index + 1;
+    if (inputRefs.current[nextIndex]) {
+      inputRefs.current[nextIndex].focus();
     }
   };
 
-  // 책 변경 시 1장 구절로 자동 설정
-  const handleBookChangeWithFirstChapter = (book) => {
-    handleBookChange(book);
-
-    // 첫 번째 장과 그 구절로 설정
-    const firstChapter = chapters[0]?.chapter || 1;
-    handleChapterChange(firstChapter);
-  };
+  const bookPlaceholder =
+    selectedVersion === "NewKoreanRevisedVersion"
+      ? "책을 선택해주세요"
+      : "Select a Book";
+  const chapterPlaceholder =
+    selectedVersion === "NewKoreanRevisedVersion"
+      ? "장을 선택해주세요"
+      : "Select a Chapter";
 
   return (
     <div className="BibleContent">
-      {showSelect && (
+      {showSelect ? (
         <div className="select-wrap">
           <select
-            value={selectedBook}
-            onChange={(e) => handleBookChangeWithFirstChapter(e.target.value)}
+            value={selectedVersion}
+            onChange={(e) => {
+              handleVersionChange(e.target.value);
+              setShowSelect(true);
+            }}
           >
-            <option value="">책을 선택해주세요</option>
-            {books.map((book, index) => (
+            <option value="NewKoreanRevisedVersion">개역개정</option>
+            <option value="KingJamesVersion">English(KJV)</option>
+          </select>
+          <select
+            value={selectedBook || ""}
+            onChange={(e) => handleBookChange(e.target.value)}
+          >
+            <option value="">{bookPlaceholder}</option>
+            {versionBooks.map((book, index) => (
               <option key={index} value={book}>
                 {book}
               </option>
@@ -57,21 +70,26 @@ const BibleContent = () => {
             onChange={(e) => handleChapterChange(Number(e.target.value))}
             disabled={!selectedBook}
           >
-            <option value="">장을 선택해주세요</option>
+            <option value="">{chapterPlaceholder}</option>
             {chapters.map((chapter, index) => (
               <option key={index} value={chapter.chapter}>
-                제 {chapter.chapter} 장
+                {selectedVersion === "NewKoreanRevisedVersion"
+                  ? `제 ${chapter.chapter} 장`
+                  : `Chapter ${chapter.chapter}`}
               </option>
             ))}
           </select>
         </div>
-      )}
+      ) : null}
 
-      {/* 책과 장이 선택된 경우에만 제목과 구절 표시 */}
       {selectedBook && selectedChapter && verses.length > 0 ? (
-        <>
+        <div>
           <h2>{selectedBook}</h2>
-          <h3>제 {selectedChapter} 장</h3>
+          <h3>
+            {selectedVersion === "NewKoreanRevisedVersion"
+              ? `제 ${selectedChapter} 장`
+              : `Chapter ${selectedChapter}`}
+          </h3>
           {verses.map((verse, index) => (
             <div key={index} className="verse-container">
               <BibleVerse index={index} />
@@ -82,7 +100,7 @@ const BibleContent = () => {
               />
             </div>
           ))}
-        </>
+        </div>
       ) : null}
     </div>
   );

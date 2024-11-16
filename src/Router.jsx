@@ -4,7 +4,7 @@ import Mypage from "./pages/Mypage";
 import Ranking from "./pages/Ranking";
 import Community from "./pages/Community";
 import BibleTranscription from "./pages/BibleTranscription";
-import { BibleProvider } from "./context/BibleContext";
+import { BibleProvider } from "../src/api/context/BibleContext";
 
 function AppRouter() {
   return (

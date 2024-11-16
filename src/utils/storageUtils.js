@@ -3,7 +3,8 @@ export const saveInputToLocalStorage = (
   value,
   userId,
   selectedBook,
-  selectedChapter
+  selectedChapter,
+  selectedVersion
 ) => {
   const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
 
@@ -17,17 +18,21 @@ export const saveInputToLocalStorage = (
   if (!currentReading) {
     currentReading = {
       readingCount: userData.readings.length + 1,
-      completedBooks: [],
+      completedVersions: {},
     };
     userData.readings.push(currentReading);
   }
 
-  let bookData = currentReading.completedBooks.find(
-    (b) => b.book === selectedBook
-  );
+  if (!currentReading.completedVersions[selectedVersion]) {
+    currentReading.completedVersions[selectedVersion] = [];
+  }
+
+  let versionData = currentReading.completedVersions[selectedVersion];
+
+  let bookData = versionData.find((b) => b.book === selectedBook);
   if (!bookData) {
     bookData = { book: selectedBook, chapters: [] };
-    currentReading.completedBooks.push(bookData);
+    versionData.push(bookData);
   }
 
   let chapterData = bookData.chapters.find(

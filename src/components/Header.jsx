@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import BibleContext from "../context/BibleContext";
+import BibleContext from "../api/context/BibleContext";
 import Swal from "sweetalert2";
 import "./Header.css";
 

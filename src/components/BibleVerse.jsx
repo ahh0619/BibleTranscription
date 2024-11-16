@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import BibleContext from "../context/BibleContext";
+import BibleContext from "../api/context/BibleContext";
 import "./BibleVerse.css";
 
 const BibleVerse = ({ index }) => {

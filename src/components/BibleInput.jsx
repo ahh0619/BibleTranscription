@@ -1,7 +1,7 @@
 import { forwardRef, useContext } from "react";
 import PropTypes from "prop-types";
 import "./BibleInput.css";
-import BibleContext from "../context/BibleContext";
+import BibleContext from "../api/context/BibleContext";
 
 const BibleInput = forwardRef(function BibleInput({ index, onEnter }, ref) {
   const { inputValues, handleInputChange } = useContext(BibleContext);
