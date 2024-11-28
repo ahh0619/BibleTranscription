@@ -12,11 +12,13 @@ const BibleContent = () => {
     chapters,
     verses,
     selectedVersion,
+    readingCount, // 버전별 독 수
     showSelect,
     setShowSelect,
     handleBookChange,
     handleChapterChange,
     handleVersionChange,
+    isReadingComplete, // 1독 완료 여부
   } = useContext(BibleContext);
 
   const inputRefs = useRef([]);
@@ -82,6 +84,7 @@ const BibleContent = () => {
         </div>
       ) : null}
 
+      {/* 성경 내용 출력 */}
       {selectedBook && selectedChapter && verses.length > 0 ? (
         <div>
           <h2>{selectedBook}</h2>
@@ -102,6 +105,17 @@ const BibleContent = () => {
           ))}
         </div>
       ) : null}
+
+      {/* 다독 완료 메시지 */}
+      {isReadingComplete && (
+        <div className="completion-message">
+          <p>
+            {selectedVersion === "NewKoreanRevisedVersion"
+              ? `🎉 축하합니다! ${readingCount[selectedVersion]}독을 완료하셨습니다!`
+              : `🎉 Congratulations! You have completed ${readingCount[selectedVersion]} readings!`}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
