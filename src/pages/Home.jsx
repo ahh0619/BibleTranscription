@@ -56,7 +56,7 @@ const Home = () => {
         <div className="today-the-bible">
           {todaysVerse ? (
             <>
-              <p>{todaysVerse.text}</p>
+              <p className="today-verse-p">{todaysVerse.text}</p>
               <p>{todaysVerse.reference}</p>
             </>
           ) : (

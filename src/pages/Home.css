@@ -17,6 +17,10 @@
   text-align: center;
 }
 
+.Home .today-verse-p {
+  width: 50%;
+}
+
 .Home button {
   margin-top: 20px;
   border-radius: 5px;

@@ -6,7 +6,7 @@ import BibleContext from "../api/context/BibleContext";
 const BibleInput = forwardRef(function BibleInput({ index, onEnter }, ref) {
   const { inputValues, handleInputChange, verses } = useContext(BibleContext);
   const value = inputValues[index] || "";
-  const correctVerseText = verses[index]?.text || ""; // 현재 구절의 올바른 텍스트
+  const correctVerseText = verses[index]?.text || "";
 
   const handleChange = (e) => {
     handleInputChange(index, e.target.value);
@@ -17,7 +17,7 @@ const BibleInput = forwardRef(function BibleInput({ index, onEnter }, ref) {
       if (value.trim() === correctVerseText.trim()) {
         onEnter();
       }
-      e.preventDefault(); // 기본 Enter 동작 방지
+      e.preventDefault();
     }
   };
 

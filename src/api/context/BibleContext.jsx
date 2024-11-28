@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { disableRightClick, disableCopyPaste } from "../../utils/eventHandlers";
-import { saveInputToLocalStorage } from "../../utils/storageUtils"; // 저장/불러오기 로직 분리
-import { loadSavedData } from "../../utils/dataUtils"; // 저장/불러오기 로직 분리
+import { saveInputToLocalStorage } from "../../utils/storageUtils";
+import { loadSavedData } from "../../utils/dataUtils";
 
 const BibleContext = createContext();
 
@@ -17,7 +17,7 @@ export const BibleProvider = ({ children }) => {
   );
   const [showSelect, setShowSelect] = useState(true);
 
-  const userId = "admin"; // 기본 userId 설정
+  const userId = "admin";
 
   const fetchBooks = async () => {
     try {
@@ -64,18 +64,16 @@ export const BibleProvider = ({ children }) => {
       selectedBook,
       selectedChapter,
       selectedVersion,
-      1 // 기본적으로 1독
+      1
     );
   };
 
   useEffect(() => {
     fetchBooks();
 
-    // 이벤트 리스너 추가
     document.addEventListener("contextmenu", disableRightClick);
     document.addEventListener("keydown", disableCopyPaste);
 
-    // 컴포넌트가 언마운트될 때 이벤트 제거
     return () => {
       document.removeEventListener("contextmenu", disableRightClick);
       document.removeEventListener("keydown", disableCopyPaste);
