@@ -1,7 +1,9 @@
 import { createContext, useState, useEffect } from "react";
 import { disableRightClick, disableCopyPaste } from "../../utils/eventHandlers";
 import { loadSavedData } from "../../utils/dataUtils";
-import { saveInputToLocalStorage } from "../../utils/storageUtils";
+import { saveInputToFirebase } from "../../utils/storageUtils";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 
 const TOTAL_VERSES = 31173; // 전체 성경 절 수
 
@@ -43,77 +45,110 @@ export const BibleProvider = ({ children }) => {
   };
 
   // 최대 readingCount 가져오기
-  const initializeReadingCount = () => {
-    const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
-    if (savedData.readings && savedData.readings.length > 0) {
-      // 가장 높은 readingCount 가져오기
-      const maxReadingCount = Math.max(
-        ...savedData.readings.map((reading) => reading.readingCount)
-      );
-      setReadingCount(maxReadingCount); // 가장 높은 readingCount로 설정
-    } else {
-      setReadingCount(0); // 데이터가 없으면 0으로 초기화
+  const initializeReadingCount = async () => {
+    try {
+      const docRef = doc(db, userId, "bible");
+      const docSnapshot = await getDoc(docRef);
+
+      if (docSnapshot.exists()) {
+        const savedData = docSnapshot.data();
+        if (savedData.readings && savedData.readings.length > 0) {
+          const maxReadingCount = Math.max(
+            ...savedData.readings.map((reading) => reading.readingCount)
+          );
+          setReadingCount((prev) => ({
+            ...prev,
+            [selectedVersion]: maxReadingCount,
+          }));
+          console.log("Updated readingCount:", readingCount);
+        } else {
+          setReadingCount((prev) => ({
+            ...prev,
+            [selectedVersion]: 0,
+          }));
+        }
+      } else {
+        setReadingCount((prev) => ({
+          ...prev,
+          [selectedVersion]: 0,
+        }));
+      }
+    } catch (error) {
+      console.error("Error initializing reading count:", error);
+      setReadingCount((prev) => ({
+        ...prev,
+        [selectedVersion]: 0,
+      }));
     }
   };
 
   // 1독 완료 여부 확인
-  const checkReadingCompletion = () => {
-    const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
+  const checkReadingCompletion = async () => {
+    try {
+      const docRef = doc(db, userId, "bible");
+      const docSnapshot = await getDoc(docRef);
 
-    if (!savedData.readings || savedData.readings.length === 0) {
-      setIsReadingComplete(false);
-      return;
-    }
+      if (!docSnapshot.exists()) {
+        setIsReadingComplete(false);
+        return;
+      }
 
-    const currentReading = savedData.readings.find(
-      (reading) => reading.readingCount === readingCount[selectedVersion]
-    );
+      const savedData = docSnapshot.data();
 
-    if (!currentReading) {
-      setIsReadingComplete(false);
-      return;
-    }
+      if (!savedData.readings || savedData.readings.length === 0) {
+        setIsReadingComplete(false);
+        return;
+      }
 
-    // 저장된 모든 절의 개수 확인
-    const totalVersesCompleted = currentReading.versions.reduce(
-      (total, version) =>
-        total +
-        version.completedBooks.reduce(
-          (bookTotal, book) =>
-            bookTotal +
-            book.chapters.reduce(
-              (chapterTotal, chapter) => chapterTotal + chapter.verses.length,
-              0
-            ),
-          0
-        ),
-      0
-    );
+      const currentReading = savedData.readings.find(
+        (reading) => reading.readingCount === readingCount[selectedVersion]
+      );
 
-    // 1독 완료 여부 확인
-    if (totalVersesCompleted === TOTAL_VERSES) {
-      setIsReadingComplete(true);
+      if (!currentReading) {
+        setIsReadingComplete(false);
+        return;
+      }
 
-      // 현재 버전의 독 수 증가
-      setReadingCount((prevCounts) => ({
-        ...prevCounts,
-        [selectedVersion]: prevCounts[selectedVersion] + 1,
-      }));
+      const totalVersesCompleted = currentReading.versions.reduce(
+        (total, version) =>
+          total +
+          version.completedBooks.reduce(
+            (bookTotal, book) =>
+              bookTotal +
+              book.chapters.reduce(
+                (chapterTotal, chapter) => chapterTotal + chapter.verses.length,
+                0
+              ),
+            0
+          ),
+        0
+      );
 
-      // 초기화 상태로 설정
-      setSelectedBook("");
-      setSelectedChapter(null);
-      setChapters([]);
-      setVerses([]);
-      setInputValues({});
-    } else {
+      if (totalVersesCompleted === TOTAL_VERSES) {
+        setIsReadingComplete(true);
+
+        setReadingCount((prevCounts) => ({
+          ...prevCounts,
+          [selectedVersion]: prevCounts[selectedVersion] + 1,
+        }));
+
+        setSelectedBook("");
+        setSelectedChapter(null);
+        setChapters([]);
+        setVerses([]);
+        setInputValues({});
+      } else {
+        setIsReadingComplete(false);
+      }
+    } catch (error) {
+      console.error("Error checking reading completion:", error);
       setIsReadingComplete(false);
     }
   };
 
   // 데이터 저장 핸들러
   const handleSaveInput = (verseNumber, value) => {
-    saveInputToLocalStorage(
+    saveInputToFirebase(
       verseNumber,
       value,
       userId,
@@ -128,23 +163,37 @@ export const BibleProvider = ({ children }) => {
   };
 
   // 저장된 데이터 로드
-  const handleLoadSavedData = () => {
-    if (!selectedBook || selectedChapter === null) return;
+  const handleLoadSavedData = async () => {
+    if (!selectedBook || selectedChapter === null) {
+      return;
+    }
 
-    const loadedVerses = loadSavedData(
-      readingCount,
-      selectedVersion,
-      userId,
-      selectedBook,
-      selectedChapter
-    );
+    try {
+      // `loadSavedData` 호출
+      const loadedVerses = await loadSavedData(
+        readingCount[selectedVersion],
+        selectedVersion,
+        userId,
+        selectedBook,
+        selectedChapter
+      );
 
-    const formattedValues = loadedVerses.reduce((acc, verse) => {
-      acc[verse.verse] = verse.content;
-      return acc;
-    }, {});
+      if (!Array.isArray(loadedVerses)) {
+        console.log("Loaded verses is not an array:", loadedVerses);
+        setInputValues({});
+        return;
+      }
 
-    setInputValues(formattedValues);
+      const formattedValues = loadedVerses.reduce((acc, verse) => {
+        acc[verse.verse] = verse.content;
+        return acc;
+      }, {});
+
+      setInputValues(formattedValues || {});
+    } catch (error) {
+      console.error("Error handling loaded data:", error);
+      setInputValues({});
+    }
   };
 
   // 책 변경 핸들러

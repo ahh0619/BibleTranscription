@@ -1,44 +1,58 @@
-export const loadSavedData = (
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../api/firebase/firebase"; // Firebase 초기화 코드 import
+
+export const loadSavedData = async (
   readingCount,
   language,
   userId,
   selectedBook,
   selectedChapter
 ) => {
-  // 로컬스토리지에서 데이터를 가져옵니다.
-  const savedData = JSON.parse(localStorage.getItem(userId) || "{}");
+  try {
+    const docRef = doc(db, userId, "bible");
+    const docSnapshot = await getDoc(docRef);
 
-  // userId 및 readings 확인
-  if (!savedData.userId || !savedData.readings) {
+    if (!docSnapshot.exists()) {
+      return [];
+    }
+
+    const savedData = docSnapshot.data();
+
+    if (!savedData.readings) {
+      return [];
+    }
+
+    const readingData = savedData.readings.find(
+      (r) => r.readingCount === Number(readingCount)
+    );
+
+    if (!readingData) {
+      return [];
+    }
+
+    const versionData = readingData.versions.find(
+      (v) => v.version.toLowerCase() === language.toLowerCase()
+    );
+
+    if (!versionData) {
+      return [];
+    }
+
+    const bookData = versionData.completedBooks.find(
+      (b) => b.book === selectedBook
+    );
+
+    if (!bookData) {
+      return [];
+    }
+
+    const chapterData = bookData.chapters.find(
+      (ch) => ch.chapter === Number(selectedChapter)
+    );
+
+    return chapterData?.verses || [];
+  } catch (error) {
+    console.error("Error loading data from Firestore:", error);
     return [];
   }
-
-  // readingCount 찾기
-  const readingData = savedData.readings.find(
-    (r) => r.readingCount === readingCount
-  );
-  if (!readingData) {
-    return [];
-  }
-
-  // versions에서 해당 버전 찾기
-  const versionData = readingData.versions.find((v) => v.version === language);
-  if (!versionData) {
-    return [];
-  }
-
-  // completedBooks에서 해당 책 찾기
-  const bookData = versionData.completedBooks.find(
-    (b) => b.book === selectedBook
-  );
-  if (!bookData) {
-    return [];
-  }
-
-  // chapters에서 해당 장 찾기
-  const chapterData = bookData.chapters.find(
-    (ch) => ch.chapter === selectedChapter
-  );
-
-  return chapterData?.verses || [];
 };

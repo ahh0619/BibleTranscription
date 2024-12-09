@@ -8,7 +8,7 @@ import { BibleProvider } from "../src/api/context/BibleContext";
 
 function AppRouter() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <BibleProvider>
         <Routes>
           <Route path="/" element={<Home />} />
